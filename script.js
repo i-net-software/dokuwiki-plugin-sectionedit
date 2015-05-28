@@ -70,6 +70,12 @@
             $tmpWrap.detach();
 
             getDialog('close').dialog('destroy').detach();
+            
+            // This is being set by the edit.js - needs reset before unloading
+            window.onbeforeunload = '';
+            textChanged = false;
+            dw_locktimer.clear();
+
             initJQuery();
         });
     };
