@@ -34,7 +34,8 @@ class action_plugin_sectionedit extends DokuWiki_Action_Plugin {
      */
     public function handle_ajax_call(Doku_Event &$event, $param) {
     
-        global $INPUT, $ACT;
+        global  $ACT,  $INPUT, $QUERY, $ID, $REV, $DATE_AT, $IDX,
+        $DATE, $RANGE, $HIGH, $TEXT, $PRE, $SUF, $SUM, $INFO, $JSINFO;
         
         if ( $event->data != 'sectionedit' ) return false;
         $event->preventDefault();
@@ -52,7 +53,8 @@ class action_plugin_sectionedit extends DokuWiki_Action_Plugin {
     
     function handle_suppress_default_after(Doku_Event &$event, $param) {
         
-        global $ACT, $ID, $RANGE;
+        global  $ACT,  $INPUT, $QUERY, $ID, $REV, $DATE_AT, $IDX,
+        $DATE, $RANGE, $HIGH, $TEXT, $PRE, $SUF, $SUM, $INFO, $JSINFO;
         // If this plugin already ran into the sectionedit action, we will be inited and we can just output the template
         // if the ACT was save, return nothing to John Snow. We need another request for show.
         // hint: super evil. handle with care. experimental.
