@@ -30,7 +30,7 @@
     };
     
     var request = function(data, success) {
-        data['id']     = $currentButton.find('input[name=id]').val();
+        data['id']     = $currentButton.find('input[name=id]').val() || JSINFO['id'];
         data['rev']    = $currentButton.find('input[name=rev]').val();
         data['call']   = 'sectionedit';
         data['target'] = $currentButton.find('input[name=target]').val();
