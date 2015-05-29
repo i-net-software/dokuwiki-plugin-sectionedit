@@ -1,7 +1,7 @@
 base   sectionedit
 author i-net software
 email  tools@inetsoftware.de
-date   2015-05-28
+date   2015-05-29
 name   sectionedit plugin
 desc   Add tags to sections using the taggadd gui
 url    http://github.com/inetsoftware/dokuwiki-plugin-sectionedit
