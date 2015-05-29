@@ -12,14 +12,15 @@
     var currentNamespace = JSINFO['namespace'];
     var $currentButton = null;
     var init = function() {
-        
-        jQuery('.editbutton_section form.btn_secedit').submit(function(event){
+        jQuery('.editbutton_section form.btn_secedit').submit(loadEditDialog);
+    };
+    
+    var loadEditDialog = function(event){
             
-            $currentButton = jQuery(this);
-            console.log($currentButton);
-            request({'do':'edit'}, showEditDialog);
-            return false;
-        });
+        $currentButton = jQuery(this);
+        console.log($currentButton);
+        request({'do':'edit'}, showEditDialog);
+        return false;
     };
     
     var showEditDialog = function(data) {
@@ -54,34 +55,43 @@
             objects[this.name] = $element.val();
         });
 
-        request(objects, function(data){
-
-            var $toRemove = $currentButton.parent().parent().children(),
-            $tmpWrap = jQuery('<div style="display:none"></div>').html(data);  // temporary wrapper
-            
-            // insert the section highlight wrapper before the last element added to $tmpStore
-            $toRemove.filter(':last').before($tmpWrap);
-            // and remove the elements
-            $toRemove.detach();
-            
-            // Now remove the content again
-            $tmpWrap.before($tmpWrap.children().detach());
-            // ...and remove the section highlight wrapper
-            $tmpWrap.detach();
-
+        request(objects, function(){
+            // We need to wrap this once more, because otherwise the edit buttons will have the wrong ranges
+            request({}, function(data){
+                var $toRemove = $currentButton.parent().parent().children(),
+                $tmpWrap = jQuery('<div style="display:none"></div>').html(data);  // temporary wrapper
+                
+                // insert the section highlight wrapper before the last element added to $tmpStore
+                $toRemove.filter(':last').before($tmpWrap);
+                // and remove the elements
+                $toRemove.detach();
+                
+                // Now remove the content again
+                $tmpWrap.before($tmpWrap.children().detach());
+                // ...and remove the section highlight wrapper
+                $tmpWrap.detach();
+    
+                closeDialog();
+                initJQuery();
+            });
+        });
+    };
+    
+    var closeDialog = function() {
+        
             getDialog('close').dialog('destroy').detach();
             
             // This is being set by the edit.js - needs reset before unloading
             window.onbeforeunload = '';
+            deleteDraft && deleteDraft();
             textChanged = false;
             dw_locktimer.clear();
-
-            initJQuery();
-        });
     };
     
     var initJQuery = function() {
         
+        // Remove current edit handler
+        jQuery('.editbutton_section form.btn_secedit').unbind('submit', loadEditDialog);
         jQuery('script[src]').each(function(){
             var $xchange = jQuery(this);
             var $new = jQuery('<script/>').attr('type', $xchange.attr('type')).attr('defer', 'true');
@@ -101,7 +111,7 @@
                 closeOnEscape:false,
                 modal:true,
                 buttons:[
-                    {text:LANG.plugins.sectionedit['closeDialog'],click: function() { getDialog('close') }},
+                    {text:LANG.plugins.sectionedit['closeDialog'],click: closeDialog },
                     {text:LANG.plugins.sectionedit['save'],click: saveSection},
                     ],
                 });

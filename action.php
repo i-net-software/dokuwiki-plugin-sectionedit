@@ -34,14 +34,14 @@ class action_plugin_sectionedit extends DokuWiki_Action_Plugin {
      */
     public function handle_ajax_call(Doku_Event &$event, $param) {
     
-        global $INPUT, $ID, $INFO, $ACT, $RANGE, $REV;
+        global $INPUT, $ACT;
         
         if ( $event->data != 'sectionedit' ) return false;
         $event->preventDefault();
 
         $ACT = act_validate($INPUT->str('do'));
         if ( !in_array($ACT, array('show', 'edit', 'save')) ) return;
-        $this->inited = true;
+        $this->inited = $ACT;
 
         // This seems super evil.
         // if we catch all our variables, include the doku.php to do its normal magic.
@@ -52,9 +52,11 @@ class action_plugin_sectionedit extends DokuWiki_Action_Plugin {
     
     function handle_suppress_default_after(Doku_Event &$event, $param) {
         
+        global $ACT, $ID, $RANGE;
         // If this plugin already ran into the sectionedit action, we will be inited and we can just output the template
+        // if the ACT was save, return nothing to John Snow. We need another request for show.
         // hint: super evil. handle with care. experimental.
-        if ( !$this->inited ) return;
+        if ( is_null($this->inited) || $this->inited == 'save' ) return;
         tpl_content();
         exit;
     }
