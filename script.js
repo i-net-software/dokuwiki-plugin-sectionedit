@@ -54,12 +54,32 @@
             
             objects[this.name] = $element.val();
         });
+        
+        var hasParentsWithDokuWikiContent = function( $nodeWithParents ) {
+            
+            if ( $nodeWithParents.is( 'body' ) ) {
+                return false;
+            }
+            
+            if ( $nodeWithParents.children().filter('h1,h2,h3,h4,h5,h6,.level1,.level2,.level3,.level4,.level5,.level6').length ) {
+                return true;
+            }
+            
+            return hasParentsWithDokuWikiContent( $nodeWithParents.parent() );
+        };
 
         request(objects, function(){
             // We need to wrap this once more, because otherwise the edit buttons will have the wrong ranges
             request({}, function(data){
-                var $toRemove = $currentButton.parent().parent().children(),
+                
+                var $toRemove = $currentButton.parent(),
                 $tmpWrap = jQuery('<div style="display:none"></div>').html(data);  // temporary wrapper
+                
+                while( hasParentsWithDokuWikiContent( $toRemove.parent() ) ) {
+                    $toRemove = $toRemove.parent();
+                }
+                
+                $toRemove = $toRemove.children();
                 
                 // insert the section highlight wrapper before the last element added to $tmpStore
                 $toRemove.filter(':last').before($tmpWrap);
